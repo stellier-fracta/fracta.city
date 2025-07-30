@@ -88,7 +88,7 @@ export default function DashboardPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-white mb-2">Dashboard</h1>
-            <p className="text-gray-300">Welcome back! Here's your investment overview.</p>
+            <p className="text-gray-300">Welcome back! Here&apos;s your investment overview.</p>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">

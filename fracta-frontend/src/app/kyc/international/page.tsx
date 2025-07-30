@@ -18,17 +18,6 @@ export default function InternationalKYCPage() {
     faceScan?: string;
   }>({});
   const [isCapturing, setIsCapturing] = useState(false);
-  const [personalInfo, setPersonalInfo] = useState({
-    firstName: '',
-    lastName: '',
-    dateOfBirth: '',
-    nationality: '',
-    countryOfResidence: '',
-    addressLine1: '',
-    city: '',
-    postalCode: '',
-    addressCountry: ''
-  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -99,13 +88,6 @@ export default function InternationalKYCPage() {
     const currentIndex = steps.findIndex(step => step.id === currentStep);
     if (currentIndex < steps.length - 1) {
       setCurrentStep(steps[currentIndex + 1].id as KYCStep);
-    }
-  };
-
-  const prevStep = () => {
-    const currentIndex = steps.findIndex(step => step.id === currentStep);
-    if (currentIndex > 0) {
-      setCurrentStep(steps[currentIndex - 1].id as KYCStep);
     }
   };
 
@@ -274,7 +256,7 @@ export default function InternationalKYCPage() {
                           ? 'border-accent-secondary bg-gradient-secondary/20'
                           : 'border-white/10 hover:border-accent-secondary/50'
                       }`}
-                      onClick={() => setDocumentType(doc.value as any)}
+                      onClick={() => setDocumentType(doc.value as typeof documentType)}
                     >
                       <div className="text-4xl mb-4">{doc.icon}</div>
                       <h3 className="text-lg font-semibold text-white">{doc.label}</h3>
