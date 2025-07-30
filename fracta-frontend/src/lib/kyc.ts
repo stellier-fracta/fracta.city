@@ -57,7 +57,7 @@ export interface InternationalKYCData {
 }
 
 export class KYCService {
-  static async submitProsperaKYC(data: ProsperaKYCData): Promise<any> {
+  static async submitProsperaKYC(data: ProsperaKYCData): Promise<unknown> {
     console.log('Submitting Prospera KYC:', data);
     
     const response = await fetch(`${API_BASE_URL}/kyc/test-prospera-verify`, {
@@ -83,7 +83,7 @@ export class KYCService {
     return response.json();
   }
 
-  static async submitInternationalKYC(data: InternationalKYCData): Promise<any> {
+  static async submitInternationalKYC(data: InternationalKYCData): Promise<unknown> {
     console.log('Submitting International KYC:', data);
     
     const response = await fetch(`${API_BASE_URL}/kyc/international-verify`, {
@@ -102,7 +102,7 @@ export class KYCService {
     return response.json();
   }
 
-  static async getKYCStatus(): Promise<any> {
+  static async getKYCStatus(): Promise<unknown> {
     const response = await fetch(`${API_BASE_URL}/kyc/status`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -116,7 +116,7 @@ export class KYCService {
     return response.json();
   }
 
-  static async getKYCRecords(): Promise<any> {
+  static async getKYCRecords(): Promise<unknown> {
     const response = await fetch(`${API_BASE_URL}/kyc/records`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -173,7 +173,7 @@ export class KYCService {
     }));
   }
 
-  static async approveKYC(kycId: number): Promise<any> {
+  static async approveKYC(kycId: number): Promise<unknown> {
     console.log('Approving KYC:', kycId);
     
     const response = await fetch(`${API_BASE_URL}/kyc/test-admin/${kycId}/approve`, {
@@ -187,7 +187,7 @@ export class KYCService {
     return response.json();
   }
 
-  static async rejectKYC(kycId: number, reason: string): Promise<any> {
+  static async rejectKYC(kycId: number, reason: string): Promise<unknown> {
     console.log('Rejecting KYC:', kycId, 'with reason:', reason);
     
     const response = await fetch(`${API_BASE_URL}/kyc/test-admin/${kycId}/reject`, {
@@ -205,7 +205,7 @@ export class KYCService {
     return response.json();
   }
 
-  static async getKYCSubmissionDetails(kycId: number): Promise<any> {
+  static async getKYCSubmissionDetails(kycId: number): Promise<unknown> {
     const response = await fetch(`${API_BASE_URL}/kyc/admin/${kycId}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('admin_token')}`,
