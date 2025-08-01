@@ -27,6 +27,7 @@ export function useAutoNetworkSwitch() {
   const addBaseSepoliaNetwork = async () => {
     if (typeof window !== 'undefined' && (window as any).ethereum) {
       try {
+        console.log('Attempting to add Base Sepolia network to wallet...');
         await (window as any).ethereum.request({
           method: 'wallet_addEthereumChain',
           params: [{
@@ -42,33 +43,52 @@ export function useAutoNetworkSwitch() {
             iconUrls: ['https://raw.githubusercontent.com/ethereum-optimism/brand-kit/main/assets/svg/Base_Network_Logo.svg']
           }]
         });
+        console.log('Base Sepolia network added successfully');
       } catch (error) {
         console.error('Failed to add Base Sepolia network:', error);
+        // If user rejects, show a message
+        if ((error as any)?.code === 4001) {
+          console.log('User rejected adding Base Sepolia network');
+        }
       }
+    }
+  };
+
+  const switchToBaseSepolia = async () => {
+    try {
+      console.log(`Attempting to switch from chain ${chainId} to Base Sepolia (${baseSepolia.id})`);
+      await switchChain({ chainId: baseSepolia.id });
+      console.log('Successfully switched to Base Sepolia');
+    } catch (error) {
+      console.log('Failed to switch chain, attempting to add network:', error);
+      // If switching fails (usually because network doesn't exist), try to add the network
+      await addBaseSepoliaNetwork();
     }
   };
 
   useEffect(() => {
     if (isConnected && address) {
       if (chainId !== baseSepolia.id) {
-        console.log(`Switching from chain ${chainId} to Base Sepolia (${baseSepolia.id})`);
-        try {
-          switchChain({ chainId: baseSepolia.id });
-        } catch (error: unknown) {
-          console.log('Failed to switch chain, attempting to add network:', error);
-          // If switching fails, try to add the network
-          addBaseSepoliaNetwork();
-        }
+        console.log(`Wallet connected but on wrong network. Current: ${chainId}, Target: ${baseSepolia.id}`);
+        // Use setTimeout to ensure the wallet is fully connected before attempting to switch
+        const timer = setTimeout(() => {
+          switchToBaseSepolia();
+        }, 1000);
+        
+        return () => clearTimeout(timer);
+      } else {
+        console.log('Wallet connected and on correct network (Base Sepolia)');
       }
     }
-  }, [isConnected, address, chainId, switchChain, addBaseSepoliaNetwork]);
+  }, [isConnected, address, chainId]);
 
   return {
     isCorrectNetwork: chainId === baseSepolia.id,
     isSwitching: isPending,
     currentChainId: chainId,
     targetChainId: baseSepolia.id,
-    addNetwork: addBaseSepoliaNetwork
+    addNetwork: addBaseSepoliaNetwork,
+    switchNetwork: switchToBaseSepolia
   };
 }
 

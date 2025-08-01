@@ -3,14 +3,25 @@
 import React from 'react';
 import Link from 'next/link';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Building2, Menu, X, User, Wifi, WifiOff } from 'lucide-react';
+import { Building2, Menu, X, User, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { useAccount } from 'wagmi';
 import { useAutoNetworkSwitch } from '@/hooks/useBlockchain';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const { isConnected } = useAccount();
-  const { isCorrectNetwork, isSwitching, currentChainId, addNetwork } = useAutoNetworkSwitch();
+  const { isCorrectNetwork, isSwitching, currentChainId, addNetwork, switchNetwork } = useAutoNetworkSwitch();
+
+  const handleNetworkAction = async () => {
+    if (isCorrectNetwork) return;
+    
+    try {
+      await switchNetwork();
+    } catch (error) {
+      console.log('Switch failed, trying to add network');
+      await addNetwork();
+    }
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-card/80 backdrop-blur-glass border-b border-white/5">
@@ -46,7 +57,7 @@ export default function Header() {
               <div className="flex items-center space-x-2">
                 {isSwitching ? (
                   <div className="flex items-center space-x-1 text-yellow-400">
-                    <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
                     <span className="text-sm">Switching...</span>
                   </div>
                 ) : isCorrectNetwork ? (
@@ -59,10 +70,10 @@ export default function Header() {
                     <WifiOff className="w-4 h-4" />
                     <span className="text-sm">Wrong Network</span>
                     <button 
-                      onClick={addNetwork}
+                      onClick={handleNetworkAction}
                       className="ml-2 px-2 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 rounded transition-colors"
                     >
-                      Add Network
+                      Fix Network
                     </button>
                   </div>
                 )}
@@ -128,7 +139,7 @@ export default function Header() {
                 <div className="flex items-center space-x-2 py-2">
                   {isSwitching ? (
                     <div className="flex items-center space-x-1 text-yellow-400">
-                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
                       <span className="text-sm">Switching to Base Sepolia...</span>
                     </div>
                   ) : isCorrectNetwork ? (
@@ -141,10 +152,10 @@ export default function Header() {
                       <WifiOff className="w-4 h-4" />
                       <span className="text-sm">Please switch to Base Sepolia</span>
                       <button 
-                        onClick={addNetwork}
+                        onClick={handleNetworkAction}
                         className="ml-2 px-2 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 rounded transition-colors"
                       >
-                        Add Network
+                        Fix Network
                       </button>
                     </div>
                   )}
