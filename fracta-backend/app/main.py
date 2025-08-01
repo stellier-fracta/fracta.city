@@ -67,7 +67,7 @@ async def health_check():
         "database": "connected",
         "blockchain": {
             "status": blockchain_status,
-            "network": network_info.get("network_name", "Base Testnet"),
+            "network": network_info.get("network_name", "Base Sepolia"),
             "chain_id": network_info.get("chain_id", 84532),
             "contracts": {
                 "compliance_manager": os.getenv("COMPLIANCE_MANAGER_ADDRESS", "Not configured"),

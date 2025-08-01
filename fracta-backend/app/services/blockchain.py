@@ -12,7 +12,7 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 class BlockchainService:
-    """Service for interacting with Fracta.city smart contracts on Base Testnet"""
+    """Service for interacting with Fracta.city smart contracts on Base Sepolia"""
     
     def __init__(self):
         self.web3_provider_url = os.getenv("WEB3_PROVIDER_URL", "https://sepolia.base.org")
@@ -27,7 +27,7 @@ class BlockchainService:
             logger.error(f"Failed to connect to Web3 provider: {self.web3_provider_url}")
             raise Exception("Web3 connection failed")
         
-        logger.info(f"Connected to Base Testnet (Chain ID: {self.chain_id})")
+        logger.info(f"Connected to Base Sepolia (Chain ID: {self.chain_id})")
         
         # Load contract ABIs (simplified versions)
         self.compliance_manager_abi = self._get_compliance_manager_abi()
@@ -322,7 +322,7 @@ class BlockchainService:
             latest_block = self.w3.eth.get_block('latest')
             return {
                 "chain_id": self.chain_id,
-                "network_name": "Base Testnet",
+                "network_name": "Base Sepolia",
                 "latest_block": latest_block.number,
                 "connected": True,
                 "compliance_manager": self.compliance_manager_address,
@@ -332,7 +332,7 @@ class BlockchainService:
             logger.error(f"Error getting network info: {e}")
             return {
                 "chain_id": self.chain_id,
-                "network_name": "Base Testnet",
+                "network_name": "Base Sepolia",
                 "latest_block": 0,
                 "connected": False,
                 "compliance_manager": self.compliance_manager_address,

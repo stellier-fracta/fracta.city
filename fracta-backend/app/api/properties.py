@@ -402,7 +402,7 @@ async def get_network_status():
             "network": {
                 "connected": False,
                 "chain_id": 84532,
-                "network_name": "Base Testnet"
+                "network_name": "Base Sepolia"
             }
         }
 
