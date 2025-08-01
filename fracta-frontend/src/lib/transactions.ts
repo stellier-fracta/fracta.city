@@ -1,9 +1,15 @@
 /**
  * Transaction service for Fracta.city frontend
  * Handles blockchain transactions and API calls
+ * Version: 1.0.1 - Fixed API URL configuration
  */
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+// Log the API URL being used (for debugging)
+if (typeof window !== 'undefined') {
+  console.log('Transactions API_BASE_URL:', API_BASE_URL);
+}
 
 export interface TransactionResult {
   success: boolean;
