@@ -28,6 +28,10 @@ export function useAutoNetworkSwitch() {
     if (typeof window !== 'undefined' && (window as any).ethereum) {
       try {
         console.log('Attempting to add Base Sepolia network to wallet...');
+        
+        // Use a more reliable RPC URL
+        const rpcUrl = 'https://base-sepolia.publicnode.com';
+        
         await (window as any).ethereum.request({
           method: 'wallet_addEthereumChain',
           params: [{
@@ -38,7 +42,7 @@ export function useAutoNetworkSwitch() {
               symbol: 'ETH',
               decimals: 18
             },
-            rpcUrls: ['https://sepolia.base.org'],
+            rpcUrls: [rpcUrl],
             blockExplorerUrls: ['https://sepolia.basescan.org'],
             iconUrls: ['https://raw.githubusercontent.com/ethereum-optimism/brand-kit/main/assets/svg/Base_Network_Logo.svg']
           }]

@@ -74,8 +74,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
     projectId,
     chains: [baseSepolia, base], // Base Sepolia first as default
     transports: {
-      [base.id]: http(),
-      [baseSepolia.id]: http(),
+      [base.id]: http('https://mainnet.base.org'),
+      [baseSepolia.id]: http('https://base-sepolia.publicnode.com'),
     },
     // Set Base Sepolia as the default chain
     defaultChain: baseSepolia,

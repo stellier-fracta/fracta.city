@@ -16,10 +16,18 @@ export default function Header() {
     if (isCorrectNetwork) return;
     
     try {
+      // First try to switch to the network
       await switchNetwork();
     } catch (error) {
       console.log('Switch failed, trying to add network');
-      await addNetwork();
+      // If switching fails, try to add the network
+      try {
+        await addNetwork();
+      } catch (addError) {
+        console.error('Failed to add network:', addError);
+        // Show user-friendly error message
+        alert('Please manually add Base Sepolia network to your wallet. You can find the network details in your wallet settings.');
+      }
     }
   };
 
