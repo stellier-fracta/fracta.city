@@ -35,12 +35,12 @@ export default function DashboardPage() {
         setIsLoading(true);
         
         // Fetch Duna Studio tokens
-        const response = await fetch(`http://localhost:8000/api/v1/properties/blockchain/user/${address}/balance`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/properties/blockchain/user/${address}/balance`);
         const result = await response.json();
         
                  if (result.success && result.balance > 0) {
            // Get property info
-           const propertyResponse = await fetch('http://localhost:8000/api/v1/properties/blockchain/duna-studio');
+           const propertyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/properties/blockchain/duna-studio`);
            const propertyResult = await propertyResponse.json();
            
            if (propertyResult.success && propertyResult.data) {
