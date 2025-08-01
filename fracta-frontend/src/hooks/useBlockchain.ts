@@ -25,14 +25,14 @@ export function useAutoNetworkSwitch() {
   const { switchChain, isPending } = useSwitchChain();
 
   const addBaseSepoliaNetwork = async () => {
-    if (typeof window !== 'undefined' && (window as any).ethereum) {
+    if (typeof window !== 'undefined' && (window as unknown as { ethereum?: unknown }).ethereum) {
       try {
         console.log('Attempting to add Base Sepolia network to wallet...');
         
         // Use a more reliable RPC URL
         const rpcUrl = 'https://base-sepolia.publicnode.com';
         
-        await (window as any).ethereum.request({
+        await (window as unknown as { ethereum: { request: (params: unknown) => Promise<unknown> } }).ethereum.request({
           method: 'wallet_addEthereumChain',
           params: [{
             chainId: '0x14a33', // 84532 in hex
@@ -48,10 +48,10 @@ export function useAutoNetworkSwitch() {
           }]
         });
         console.log('Base Sepolia network added successfully');
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Failed to add Base Sepolia network:', error);
         // If user rejects, show a message
-        if ((error as any)?.code === 4001) {
+        if ((error as { code?: number })?.code === 4001) {
           console.log('User rejected adding Base Sepolia network');
         }
       }
@@ -63,7 +63,7 @@ export function useAutoNetworkSwitch() {
       console.log(`Attempting to switch from chain ${chainId} to Base Sepolia (${baseSepolia.id})`);
       await switchChain({ chainId: baseSepolia.id });
       console.log('Successfully switched to Base Sepolia');
-    } catch (error) {
+    } catch (error: unknown) {
       console.log('Failed to switch chain, attempting to add network:', error);
       // If switching fails (usually because network doesn't exist), try to add the network
       await addBaseSepoliaNetwork();
@@ -84,7 +84,7 @@ export function useAutoNetworkSwitch() {
         console.log('Wallet connected and on correct network (Base Sepolia)');
       }
     }
-  }, [isConnected, address, chainId]);
+  }, [isConnected, address, chainId, switchToBaseSepolia]);
 
   return {
     isCorrectNetwork: chainId === baseSepolia.id,
