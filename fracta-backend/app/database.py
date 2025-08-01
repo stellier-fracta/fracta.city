@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Database URL from environment
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://username:password@localhost/fracta_db")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./app.db")
 
 # SQLAlchemy engine
 engine = create_engine(DATABASE_URL)
