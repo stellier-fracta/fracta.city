@@ -4,7 +4,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useChainId, useSwitchChain } from 'wagmi';
+import { baseSepolia } from 'wagmi/chains';
 import { 
   blockchainService, 
   BlockchainProperty, 
@@ -12,6 +13,64 @@ import {
   UserKYCStatus,
   isSaleActive
 } from '../lib/blockchain';
+
+
+
+/**
+ * Hook to automatically switch to Base Sepolia when wallet connects
+ */
+export function useAutoNetworkSwitch() {
+  const { address, isConnected } = useAccount();
+  const chainId = useChainId();
+  const { switchChain, isPending } = useSwitchChain();
+
+  const addBaseSepoliaNetwork = async () => {
+    if (typeof window !== 'undefined' && (window as any).ethereum) {
+      try {
+        await (window as any).ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: '0x14a33', // 84532 in hex
+            chainName: 'Base Sepolia',
+            nativeCurrency: {
+              name: 'ETH',
+              symbol: 'ETH',
+              decimals: 18
+            },
+            rpcUrls: ['https://sepolia.base.org'],
+            blockExplorerUrls: ['https://sepolia.basescan.org'],
+            iconUrls: ['https://raw.githubusercontent.com/ethereum-optimism/brand-kit/main/assets/svg/Base_Network_Logo.svg']
+          }]
+        });
+      } catch (error) {
+        console.error('Failed to add Base Sepolia network:', error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isConnected && address) {
+      if (chainId !== baseSepolia.id) {
+        console.log(`Switching from chain ${chainId} to Base Sepolia (${baseSepolia.id})`);
+        try {
+          switchChain({ chainId: baseSepolia.id });
+        } catch (error: unknown) {
+          console.log('Failed to switch chain, attempting to add network:', error);
+          // If switching fails, try to add the network
+          addBaseSepoliaNetwork();
+        }
+      }
+    }
+  }, [isConnected, address, chainId, switchChain, addBaseSepoliaNetwork]);
+
+  return {
+    isCorrectNetwork: chainId === baseSepolia.id,
+    isSwitching: isPending,
+    currentChainId: chainId,
+    targetChainId: baseSepolia.id,
+    addNetwork: addBaseSepoliaNetwork
+  };
+}
 
 /**
  * Hook to fetch Duna Studio property data from blockchain

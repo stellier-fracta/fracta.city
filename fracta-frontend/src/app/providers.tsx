@@ -72,11 +72,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const config = getDefaultConfig({
     appName: 'Fracta.city',
     projectId,
-    chains: [base, baseSepolia],
+    chains: [baseSepolia, base], // Base Sepolia first as default
     transports: {
       [base.id]: http(),
       [baseSepolia.id]: http(),
     },
+    // Set Base Sepolia as the default chain
+    defaultChain: baseSepolia,
   });
 
   return (

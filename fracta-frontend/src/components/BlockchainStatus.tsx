@@ -43,7 +43,7 @@ export default function BlockchainStatus() {
             <WifiOff className="h-4 w-4 text-red-400" />
           )}
           <span className="text-sm font-medium text-text-primary">
-            {network?.network_name || 'Base Testnet'}
+            {network?.network_name || 'Base Sepolia'}
           </span>
         </div>
         <span className={`text-xs px-2 py-1 rounded ${
