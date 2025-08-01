@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Shield, Globe, CheckCircle2, XCircle, Clock, Eye, Filter, Search, RefreshCw } from 'lucide-react';
 import AdminLayout from '@/components/AdminLayout';
 import { KYCService, KYCSubmission } from '@/lib/kyc';
 
 export default function AdminKYCPage() {
+  const router = useRouter();
   const [submissions, setSubmissions] = useState<KYCSubmission[]>([]);
   const [filteredSubmissions, setFilteredSubmissions] = useState<KYCSubmission[]>([]);
   const [selectedSubmission, setSelectedSubmission] = useState<KYCSubmission | null>(null);
@@ -165,6 +167,10 @@ export default function AdminKYCPage() {
     );
   }
 
+  const handleRefresh = () => {
+    router.refresh();
+  };
+
   return (
     <AdminLayout>
       <div className="max-w-7xl mx-auto">
@@ -174,8 +180,8 @@ export default function AdminKYCPage() {
             <h1 className="text-4xl font-bold text-white mb-2">KYC Management</h1>
             <p className="text-gray-300">Review and approve identity verification submissions</p>
           </div>
-          <button
-            onClick={() => window.location.reload()}
+          <button 
+            onClick={handleRefresh}
             className="bg-gradient-primary hover:shadow-button text-white px-4 py-2 rounded-xl font-semibold transition-all duration-300 ease-smooth transform hover:-translate-y-1 flex items-center space-x-2"
           >
             <RefreshCw className="w-4 h-4" />

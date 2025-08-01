@@ -1,16 +1,18 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Search, SlidersHorizontal, MapPin, Loader2 } from 'lucide-react';
+import { Filter, TrendingUp, Building2, Users, DollarSign, RefreshCw } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import PropertyCard from '@/components/PropertyCard';
 import KYCBanner from '@/components/KYCBanner';
 import { PropertyCardProps } from '@/data/mockProperties';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useLiveProperties } from '../../../hooks/useBlockchain';
-import { BlockchainProperty } from '../../../lib/blockchain';
+import { useLiveProperties } from '@/hooks/useBlockchain';
+import { BlockchainProperty } from '@/lib/blockchain';
 
 export default function ListingsPage() {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [jurisdictionFilter, setJurisdictionFilter] = useState<'all' | 'prospera' | 'international'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'live' | 'coming-soon' | 'sold-out'>('all');
@@ -18,7 +20,7 @@ export default function ListingsPage() {
   const [showFilters, setShowFilters] = useState(false);
 
   // Get blockchain properties
-  const { properties: blockchainProperties, loading, error } = useLiveProperties();
+  const { properties: blockchainProperties, loading, error, refetch } = useLiveProperties();
 
   // Convert blockchain properties to PropertyCardProps format
   const allProperties: PropertyCardProps[] = useMemo(() => 
@@ -82,6 +84,10 @@ export default function ListingsPage() {
     return allProperties.filter(p => jurisdiction === 'all' || p.jurisdiction === jurisdiction).length;
   };
 
+  const handleRefresh = () => {
+    refetch();
+  };
+
   return (
     <div className="min-h-screen bg-bg-primary pt-16">
       {/* Enhanced Header */}
@@ -105,7 +111,7 @@ export default function ListingsPage() {
         <div className="bg-gradient-card rounded-xl shadow-card border border-white/5 p-6 mb-8">
           {/* Search Bar */}
           <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-text-muted" />
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-text-muted" />
             <input
               type="text"
               placeholder="Search properties by name or location..."
@@ -121,7 +127,7 @@ export default function ListingsPage() {
               onClick={() => setShowFilters(!showFilters)}
               className="flex items-center space-x-2 px-4 py-2 bg-bg-primary/60 backdrop-blur-glass hover:bg-bg-primary/80 rounded-lg transition-all duration-300 ease-smooth border border-white/10 hover:border-accent-primary/50"
             >
-              <SlidersHorizontal className="h-4 w-4 text-accent-primary" />
+              <Filter className="h-4 w-4 text-accent-primary" />
               <span className="text-text-primary">Filters</span>
             </button>
             <div className="text-sm text-text-secondary">
@@ -188,7 +194,7 @@ export default function ListingsPage() {
         {loading ? (
           <div className="text-center py-16">
             <div className="bg-gradient-card rounded-2xl p-12 border border-white/5 shadow-card max-w-lg mx-auto">
-              <Loader2 className="h-12 w-12 animate-spin text-accent-primary mx-auto mb-4" />
+              <RefreshCw className="h-12 w-12 animate-spin text-accent-primary mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-text-primary mb-2">Loading Properties</h3>
               <p className="text-text-muted">Fetching real-time data from blockchain...</p>
             </div>
@@ -199,7 +205,7 @@ export default function ListingsPage() {
               <h3 className="text-xl font-semibold text-red-400 mb-2">Failed to Load Properties</h3>
               <p className="text-text-muted mb-4">{error}</p>
               <button 
-                onClick={() => window.location.reload()} 
+                onClick={handleRefresh}
                 className="bg-accent-primary hover:bg-accent-primary/80 text-white px-6 py-2 rounded-lg transition-colors"
               >
                 Retry
@@ -215,7 +221,7 @@ export default function ListingsPage() {
         ) : (
           <div className="text-center py-16">
             <div className="bg-gradient-card rounded-2xl p-12 border border-white/5 shadow-card max-w-lg mx-auto">
-              <MapPin className="h-16 w-16 text-text-muted/40 mx-auto mb-4" />
+              <Building2 className="h-16 w-16 text-text-muted/40 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-text-primary mb-2">No properties found</h3>
               <p className="text-text-secondary mb-6 leading-relaxed">
                 Try adjusting your search terms or filters to find more properties.

@@ -4,12 +4,14 @@ import React, { useState } from 'react';
 import { MapPin, TrendingUp, Shield, Clock } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { PropertyCardProps } from '../data/mockProperties';
+import { useRouter } from 'next/navigation';
+import { PropertyCardProps } from '@/data/mockProperties';
 import PurchaseModal from './PurchaseModal';
-import { BlockchainProperty } from '../../lib/blockchain';
+import { BlockchainProperty } from '@/lib/blockchain';
 
 export default function PropertyCard(props: PropertyCardProps) {
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
+  const router = useRouter();
   
   const {
     name,
@@ -64,7 +66,7 @@ export default function PropertyCard(props: PropertyCardProps) {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            window.location.href = '/kyc';
+            router.push('/kyc');
           }}
           className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/30 transition-colors"
         >
@@ -156,7 +158,7 @@ export default function PropertyCard(props: PropertyCardProps) {
               e.preventDefault();
                 e.stopPropagation();
               if (status === 'live') {
-                  window.location.href = `/marketplace/${props.id || 'duna-studio'}`;
+                  router.push(`/marketplace/${props.id || 'duna-studio'}`);
               }
             }}
             disabled={isDisabled}
@@ -175,7 +177,8 @@ export default function PropertyCard(props: PropertyCardProps) {
                   e.preventDefault();
                   e.stopPropagation();
                   // TODO: Implement make offer functionality
-                  console.log('Make offer clicked');
+                  // For now, show a placeholder message
+                  alert('Make offer functionality coming soon!');
                 }}
                 className="flex-1 py-3 px-4 rounded-lg font-semibold text-sm bg-bg-primary/80 text-text-primary border border-white/10 hover:bg-bg-primary/60 transition-all duration-300 ease-smooth transform hover:-translate-y-1"
               >

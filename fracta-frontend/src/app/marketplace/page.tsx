@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { Filter, TrendingUp, Building2, Users, DollarSign } from 'lucide-react';
 import Header from '@/components/Header';
-import { useLiveProperties } from '../../../hooks/useBlockchain';
+import { useLiveProperties } from '@/hooks/useBlockchain';
 import PropertyCard from '@/components/PropertyCard';
 
 type Jurisdiction = 'all' | 'honduras' | 'prospera' | 'us';

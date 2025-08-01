@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import { X, Loader2, CheckCircle, AlertCircle, DollarSign, TrendingUp } from 'lucide-react';
-import { usePurchaseTokens, useGasEstimate } from '../../hooks/useTransactions';
-import { useCanInvest } from '../../hooks/useBlockchain';
-import { BlockchainProperty } from '../../lib/blockchain';
+import React, { useState, useEffect } from 'react';
+import { X, DollarSign, Shield, AlertCircle } from 'lucide-react';
+import { usePurchaseTokens, useGasEstimate } from '@/hooks/useTransactions';
+import { useCanInvest } from '@/hooks/useBlockchain';
+import { BlockchainProperty } from '@/lib/blockchain';
 
 interface PurchaseModalProps {
   property: BlockchainProperty;

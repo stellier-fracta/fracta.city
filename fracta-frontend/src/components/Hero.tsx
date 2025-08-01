@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { ArrowRight, Building2, MapPin, TrendingUp, Shield, Loader2 } from 'lucide-react';
 import Image from 'next/image';
-import { useBlockchainStats, useDunaStudioProperty } from '../../hooks/useBlockchain';
-import { formatPrice } from '../../lib/blockchain';
+import { useBlockchainStats, useDunaStudioProperty } from '@/hooks/useBlockchain';
+import { formatPrice } from '@/lib/blockchain';
 
 export default function Hero() {
   const { stats, loading: statsLoading } = useBlockchainStats();

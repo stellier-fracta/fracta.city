@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, MapPin, Building2, TrendingUp, Wallet, X, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi';
 import { baseSepolia } from 'wagmi/chains';
@@ -37,6 +37,7 @@ const PROPERTY_TOKEN_ADDRESS = "0xd312662Bd68743469dbFC9B819EA7c4Ba50aCB9b";
 
 export default function PropertyDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const propertyId = params['property-id'] as string;
 
   // State
@@ -127,7 +128,7 @@ export default function PropertyDetailPage() {
       setIsMinting(false);
       setShowBuyModal(false);
       // Reload the page to show updated token list
-      window.location.reload();
+      router.refresh();
     }
   }, [isSuccess]);
 
@@ -186,6 +187,10 @@ export default function PropertyDetailPage() {
     }
   }, [isPending, isMinting, isSuccess, error, modalBuyAmount]);
 
+  const handleRefresh = () => {
+    router.refresh();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-bg">
       {/* Global Header */}
@@ -194,7 +199,7 @@ export default function PropertyDetailPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Back Button */}
         <button 
-          onClick={() => window.history.back()}
+          onClick={() => router.back()}
           className="flex items-center space-x-2 text-text-muted hover:text-text-primary mb-6 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />

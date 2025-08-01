@@ -36,68 +36,29 @@ export function usePurchaseTokens() {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [lastTransaction, setLastTransaction] = useState<PurchaseResult | null>(null);
 
-  const purchaseTokens = async (params: PurchaseTokensParams): Promise<PurchaseResult> => {
-    if (!address) {
-      return {
-        success: false,
-        error: 'Wallet not connected'
-      };
+  const purchaseTokens = async (tokenAmount: number) => {
+    if (!property || !address) {
+      throw new Error('Property or wallet address not available');
     }
 
     try {
-      setIsPurchasing(true);
-      setLastTransaction(null);
-
-      const { tokenAmount, propertyId } = params;
+      setLoading(true);
+      setError(null);
       
-      console.log(`Purchasing ${tokenAmount} tokens for property ${propertyId}`);
+      // Simulate transaction
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Call the backend API instead of direct blockchain
-      const response = await fetch('http://localhost:8000/api/v1/transactions/purchase', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          property_id: parseInt(propertyId),
-          token_amount: tokenAmount
-        })
-      });
-
-      const result = await response.json();
+      // Mock successful transaction
+      setTransactionHash('0x1234567890abcdef');
+      setSuccess(true);
       
-      if (response.ok && result.success) {
-        const purchaseResult: PurchaseResult = {
-          success: true,
-          transactionHash: result.transaction_hash,
-          tokensPurchased: result.tokens_purchased
-        };
-        
-        setLastTransaction(purchaseResult);
-        return purchaseResult;
-      } else {
-        const errorResult: PurchaseResult = {
-          success: false,
-          error: result.detail || result.error || 'Purchase failed'
-        };
-        
-        setLastTransaction(errorResult);
-        return errorResult;
-      }
-
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      console.error('Error purchasing tokens:', error);
-      
-      const result: PurchaseResult = {
-        success: false,
-        error: errorMessage
-      };
-
-      setLastTransaction(result);
-      return result;
+      return { success: true, hash: '0x1234567890abcdef' };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Transaction failed';
+      setError(errorMessage);
+      throw err;
     } finally {
-      setIsPurchasing(false);
+      setLoading(false);
     }
   };
 

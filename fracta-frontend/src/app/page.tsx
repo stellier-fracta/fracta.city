@@ -8,7 +8,7 @@ import Features from '@/components/Features';
 import PropertyCard from '@/components/PropertyCard';
 import KYCBanner from '@/components/KYCBanner';
 import BlockchainStatus from '@/components/BlockchainStatus';
-import { useLiveProperties } from '../../hooks/useBlockchain';
+import { useLiveProperties } from '@/hooks/useBlockchain';
 import { Loader2 } from 'lucide-react';
 
 export default function Home() {

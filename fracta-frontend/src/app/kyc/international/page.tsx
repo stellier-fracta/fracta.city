@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Globe, ArrowLeft, Camera, CheckCircle2, Loader2, RotateCcw, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { KYCService, InternationalKYCData } from '@/lib/kyc';
@@ -20,9 +20,15 @@ export default function InternationalKYCPage() {
   const [isCapturing, setIsCapturing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [origin, setOrigin] = useState<string>('');
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Set origin after component mounts to avoid SSR issues
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
 
   const steps = [
     { id: 'document-type', title: 'Document Type', description: 'Choose your ID document' },
@@ -35,6 +41,11 @@ export default function InternationalKYCPage() {
 
   const startCamera = async () => {
     try {
+      // Check if we're in a browser environment
+      if (typeof window === 'undefined' || !navigator.mediaDevices) {
+        throw new Error('Camera not available in this environment');
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
           facingMode: 'environment',
@@ -47,6 +58,7 @@ export default function InternationalKYCPage() {
       }
     } catch (error) {
       console.error('Camera access failed:', error);
+      alert('Camera access failed. Please ensure you have granted camera permissions.');
     }
   };
 
@@ -231,7 +243,7 @@ export default function InternationalKYCPage() {
                       </div>
                     </div>
                     <div className="mb-4">
-                      <QRCode url={`${window.location.origin}/kyc/mobile`} size={128} />
+                      <QRCode url={`${origin}/kyc/mobile`} size={128} />
                     </div>
                     <a
                       href="/kyc/mobile"
@@ -375,7 +387,7 @@ export default function InternationalKYCPage() {
                   
                   {/* QR Code */}
                   <div className="mb-6">
-                    <QRCode url={`${window.location.origin}/kyc/mobile`} size={192} />
+                    <QRCode url={`${origin}/kyc/mobile`} size={192} />
                   </div>
                   
                   <div className="space-y-4">

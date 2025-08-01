@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { Wifi, WifiOff, Loader2, AlertCircle } from 'lucide-react';
-import { useNetworkStatus, useDunaStudioProperty } from '../../hooks/useBlockchain';
-import { formatPrice } from '../../lib/blockchain';
+import { useNetworkStatus, useDunaStudioProperty } from '@/hooks/useBlockchain';
+import { formatPrice } from '@/lib/blockchain';
 
 export default function BlockchainStatus() {
   const { network, loading: networkLoading, error: networkError } = useNetworkStatus();

@@ -29,6 +29,11 @@ export default function MobileKYCPage() {
 
   const startCamera = async () => {
     try {
+      // Check if we're in a browser environment
+      if (typeof window === 'undefined' || !navigator.mediaDevices) {
+        throw new Error('Camera not available in this environment');
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
           facingMode: 'environment',
@@ -41,6 +46,7 @@ export default function MobileKYCPage() {
       }
     } catch (error) {
       console.error('Camera access failed:', error);
+      alert('Camera access failed. Please ensure you have granted camera permissions.');
     }
   };
 
@@ -90,11 +96,13 @@ export default function MobileKYCPage() {
     
     try {
       // TODO: Call KYC API with captured images
-      console.log('Submitting mobile KYC:', capturedImages);
+      // For now, simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
       setIsSubmitted(true);
     } catch (error) {
       console.error('Mobile KYC submission failed:', error);
+      // Show user-friendly error message
+      alert('KYC submission failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

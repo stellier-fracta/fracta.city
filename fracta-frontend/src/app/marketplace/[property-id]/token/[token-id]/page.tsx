@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { 
   MapPin, 
   Building2, 
@@ -20,11 +20,12 @@ import {
   Copy
 } from 'lucide-react';
 import Header from '@/components/Header';
-import { useLiveProperties } from '../../../../../../hooks/useBlockchain';
-import { BlockchainProperty } from '../../../../../../lib/blockchain';
+import { useLiveProperties } from '@/hooks/useBlockchain';
+import { BlockchainProperty } from '@/lib/blockchain';
 
 export default function TokenDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const propertyId = params['property-id'] as string;
   const tokenId = params['token-id'] as string;
   
@@ -95,7 +96,7 @@ export default function TokenDetailPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Back Button */}
         <button 
-          onClick={() => window.history.back()}
+          onClick={() => router.back()}
           className="flex items-center space-x-2 text-text-muted hover:text-text-primary mb-6 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
