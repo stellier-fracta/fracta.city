@@ -24,7 +24,7 @@ export default function KYCStatus() {
     const fetchKYCStatus = async () => {
       try {
         // For now, we'll check the admin endpoint to get the latest KYC status
-        // In a real app, you'd have a user-specific endpoint
+        // In a real app, you&apos;d have a user-specific endpoint
         const submissions = await KYCService.getAdminKYCSubmissions();
         
         if (submissions.length > 0) {

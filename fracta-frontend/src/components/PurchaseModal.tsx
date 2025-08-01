@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { X, DollarSign, Shield, AlertCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, DollarSign, AlertCircle, Loader2, CheckCircle } from 'lucide-react';
 import { usePurchaseTokens, useGasEstimate } from '@/hooks/useTransactions';
 import { useCanInvest } from '@/hooks/useBlockchain';
 import { BlockchainProperty } from '@/lib/blockchain';
@@ -14,130 +14,129 @@ interface PurchaseModalProps {
 
 export default function PurchaseModal({ property, isOpen, onClose }: PurchaseModalProps) {
   const [tokenAmount, setTokenAmount] = useState(1);
-  const [step, setStep] = useState<'input' | 'confirming' | 'success' | 'error'>('input');
-  
-  const { purchaseTokens, isPurchasing, error, lastTransaction } = usePurchaseTokens();
-  const { estimateGas, isEstimating } = useGasEstimate();
-  const { canInvest, reason } = useCanInvest(property);
+  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [transactionHash, setTransactionHash] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const { canInvest, reason, requiresKYC } = useCanInvest(property);
+  const { purchaseTokens, loading } = usePurchaseTokens(property);
 
   const handlePurchase = async () => {
     if (!canInvest) {
+      setError(reason);
       return;
     }
 
-    setStep('confirming');
-    
     try {
-      const result = await purchaseTokens({
-        tokenAmount,
-        propertyId: property.id
-      });
-
-      if (result.success) {
-        setStep('success');
+      setIsPurchasing(true);
+      setError(null);
+      
+      const result = await purchaseTokens(tokenAmount);
+      
+      if (result.success && result.hash) {
+        setTransactionHash(result.hash);
+        setSuccess(true);
       } else {
-        setStep('error');
+        setError('Transaction failed');
       }
-    } catch (error) {
-      setStep('error');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Transaction failed');
+    } finally {
+      setIsPurchasing(false);
     }
   };
 
-  const handleClose = () => {
-    setStep('input');
-    setTokenAmount(1);
-    onClose();
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+    }).format(price);
   };
 
   const totalCost = tokenAmount * property.tokenPrice;
-  const maxTokens = Math.min(property.tokensRemaining, 10); // Limit to 10 tokens for testing
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleClose} />
-      
-      {/* Modal */}
-      <div className="relative bg-gradient-card rounded-2xl p-8 max-w-md w-full mx-4 border border-white/10 shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-gradient-card rounded-2xl border border-white/10 p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-text-primary">Purchase Tokens</h2>
           <button
-            onClick={handleClose}
-            className="text-text-muted hover:text-text-primary transition-colors"
+            onClick={onClose}
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 text-text-muted" />
           </button>
         </div>
 
         {/* Property Info */}
-        <div className="mb-6 p-4 bg-bg-primary/30 rounded-lg border border-white/5">
+        <div className="mb-6">
           <h3 className="text-lg font-semibold text-text-primary mb-2">{property.name}</h3>
-          <div className="flex items-center justify-between text-sm text-text-muted">
-            <span>Token Price: ${property.tokenPrice}</span>
-            <span>Available: {property.tokensRemaining} tokens</span>
+          <div className="flex items-center space-x-4 text-sm text-text-muted">
+            <span>Token Price: {formatPrice(property.tokenPrice)}</span>
+            <span>Available: {property.tokensRemaining}</span>
           </div>
         </div>
 
-        {/* Content based on step */}
-        {step === 'input' && (
-          <>
-            {/* KYC Check */}
-            {!canInvest && (
-              <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
-                <div className="flex items-center">
-                  <AlertCircle className="w-5 h-5 text-red-400 mr-2" />
-                  <span className="text-red-400 font-medium">{reason}</span>
-                </div>
-              </div>
+        {/* Investment Check */}
+        {!canInvest && (
+          <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
+            <div className="flex items-center space-x-2 text-red-400">
+              <AlertCircle className="w-5 h-5" />
+              <span className="font-semibold">Cannot Invest</span>
+            </div>
+            <p className="text-red-300 mt-2">{reason}</p>
+            {requiresKYC && (
+              <button
+                onClick={() => {
+                  onClose();
+                  window.location.href = '/kyc';
+                }}
+                className="mt-3 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+              >
+                Complete KYC
+              </button>
             )}
+          </div>
+        )}
 
-            {/* Token Amount Input */}
-            <div className="mb-6">
+        {/* Purchase Form */}
+        {canInvest && !success && (
+          <div className="space-y-4">
+            <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
                 Number of Tokens
               </label>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="number"
-                  min="1"
-                  max={maxTokens}
-                  value={tokenAmount}
-                  onChange={(e) => setTokenAmount(Number(e.target.value))}
-                  className="flex-1 px-4 py-3 bg-bg-primary/80 border border-white/10 rounded-lg focus:ring-2 focus:ring-accent-primary focus:border-accent-primary outline-none text-text-primary"
-                  disabled={!canInvest}
-                />
-                <span className="text-text-muted text-sm">max {maxTokens}</span>
+              <input
+                type="number"
+                min="1"
+                max={property.tokensRemaining}
+                value={tokenAmount}
+                onChange={(e) => setTokenAmount(Math.max(1, parseInt(e.target.value) || 1))}
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+              />
+            </div>
+
+            <div className="bg-bg-primary/30 rounded-lg p-4 border border-white/5">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-text-muted">Total Cost:</span>
+                <span className="text-xl font-bold text-accent-primary">{formatPrice(totalCost)}</span>
+              </div>
+              <div className="text-sm text-text-muted">
+                {tokenAmount} tokens × {formatPrice(property.tokenPrice)} each
               </div>
             </div>
 
-            {/* Cost Breakdown */}
-            <div className="mb-6 p-4 bg-bg-primary/30 rounded-lg border border-white/5">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-text-muted">Token Price</span>
-                <span className="text-text-primary">${property.tokenPrice}</span>
-              </div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-text-muted">Quantity</span>
-                <span className="text-text-primary">{tokenAmount}</span>
-              </div>
-              <div className="border-t border-white/10 pt-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold text-text-primary">Total Cost</span>
-                  <span className="text-xl font-bold text-accent-primary">${totalCost}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Purchase Button */}
             <button
               onClick={handlePurchase}
-              disabled={!canInvest || isPurchasing || isEstimating}
-              className="w-full bg-gradient-primary hover:shadow-button text-white py-4 rounded-lg font-semibold transition-all duration-300 ease-smooth transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              disabled={isPurchasing || loading}
+              className="w-full bg-gradient-primary hover:shadow-button text-white py-4 px-6 rounded-lg font-semibold transition-all duration-300 ease-smooth transform hover:-translate-y-1 hover:shadow-glow disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
             >
-              {isPurchasing ? (
+              {isPurchasing || loading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
                   <span>Processing...</span>
@@ -145,50 +144,46 @@ export default function PurchaseModal({ property, isOpen, onClose }: PurchaseMod
               ) : (
                 <>
                   <DollarSign className="w-5 h-5" />
-                  <span>Purchase {tokenAmount} Token{tokenAmount > 1 ? 's' : ''}</span>
+                  <span>Purchase Tokens</span>
                 </>
               )}
             </button>
-          </>
-        )}
-
-        {step === 'confirming' && (
-          <div className="text-center py-8">
-            <Loader2 className="w-12 h-12 animate-spin text-accent-primary mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-text-primary mb-2">Processing Transaction</h3>
-            <p className="text-text-muted">Please wait while we process your purchase...</p>
           </div>
         )}
 
-        {step === 'success' && (
-          <div className="text-center py-8">
-            <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-text-primary mb-2">Purchase Successful!</h3>
-            <p className="text-text-muted mb-6">
-              You have successfully purchased {tokenAmount} token{tokenAmount > 1 ? 's' : ''} for {property.name}.
+        {/* Success State */}
+        {success && (
+          <div className="text-center">
+            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8 text-green-400" />
+            </div>
+            <h3 className="text-xl font-bold text-text-primary mb-2">Purchase Successful!</h3>
+            <p className="text-text-muted mb-4">
+              Your tokens have been purchased successfully.
             </p>
+            {transactionHash && (
+              <div className="bg-bg-primary/30 rounded-lg p-3 mb-4">
+                <p className="text-sm text-text-muted mb-1">Transaction Hash:</p>
+                <p className="text-xs text-accent-primary font-mono break-all">{transactionHash}</p>
+              </div>
+            )}
             <button
-              onClick={handleClose}
-              className="bg-gradient-primary text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 ease-smooth transform hover:-translate-y-1"
+              onClick={onClose}
+              className="bg-gradient-primary hover:shadow-button text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 ease-smooth transform hover:-translate-y-1"
             >
               Close
             </button>
           </div>
         )}
 
-        {step === 'error' && (
-          <div className="text-center py-8">
-            <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-text-primary mb-2">Transaction Failed</h3>
-            <p className="text-text-muted mb-6">
-              {error?.message || 'There was an error processing your transaction. Please try again.'}
-            </p>
-            <button
-              onClick={() => setStep('input')}
-              className="bg-gradient-primary text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 ease-smooth transform hover:-translate-y-1"
-            >
-              Try Again
-            </button>
+        {/* Error State */}
+        {error && !success && (
+          <div className="mt-4 p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
+            <div className="flex items-center space-x-2 text-red-400">
+              <AlertCircle className="w-5 h-5" />
+              <span className="font-semibold">Error</span>
+            </div>
+            <p className="text-red-300 mt-2">{error}</p>
           </div>
         )}
       </div>

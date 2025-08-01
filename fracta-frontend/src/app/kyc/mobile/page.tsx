@@ -118,9 +118,9 @@ export default function MobileKYCPage() {
           <h2 className="text-2xl font-bold text-white mb-4">
             Verification Submitted!
           </h2>
-          <p className="text-gray-300 mb-6">
-            Your mobile KYC verification has been submitted successfully. You'll receive an update within 24-48 hours.
-          </p>
+                        <p className="text-gray-300 mb-6">
+                Your mobile KYC verification has been submitted successfully. You&apos;ll receive an update within 24-48 hours.
+              </p>
           <button 
             onClick={() => window.close()}
             className="bg-gradient-secondary hover:shadow-button text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 ease-smooth transform hover:-translate-y-1"
@@ -139,7 +139,7 @@ export default function MobileKYCPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">Mobile KYC</h1>
-            <p className="text-gray-300">Complete verification using your phone's camera</p>
+            <p className="text-gray-300">Complete verification using your phone&apos;s camera</p>
           </div>
 
           {/* Progress Steps */}
@@ -183,7 +183,7 @@ export default function MobileKYCPage() {
                 </div>
                 <h2 className="text-2xl font-bold text-white mb-4">Mobile Verification</h2>
                 <p className="text-gray-300 mb-6">
-                  Use your phone's camera to capture your documents and face for verification.
+                  Use your phone&apos;s camera to capture your documents and face for verification.
                 </p>
                 <button
                   onClick={nextStep}

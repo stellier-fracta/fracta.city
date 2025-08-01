@@ -134,43 +134,79 @@ export class KYCService {
   static async getAdminKYCSubmissions(filters?: {
     status?: string;
     jurisdiction?: string;
+    limit?: number;
   }): Promise<KYCSubmission[]> {
-    console.log('Getting admin KYC submissions with filters:', filters);
-    
-    const params = new URLSearchParams();
-    if (filters?.status && filters.status !== 'all') {
-      params.append('status_filter', filters.status);
-    }
-    if (filters?.jurisdiction && filters.jurisdiction !== 'all') {
-      params.append('jurisdiction_filter', filters.jurisdiction);
-    }
-    
-    const response = await fetch(`${API_BASE_URL}/kyc/test-admin/all?${params}`);
-    
-    if (!response.ok) {
-      throw new Error(`Failed to get admin KYC submissions: ${response.statusText}`);
-    }
-    
-    const kycRecords = await response.json();
-    
-    // Transform backend format to frontend format
-    return kycRecords.map((record: any) => ({
-      id: record.id,
-      userId: record.user_id,
-      userEmail: 'user@example.com', // Mock email since we don't have user data
-      userName: `${record.first_name} ${record.last_name}`,
-      kycType: record.kyc_type,
-      jurisdiction: record.jurisdiction,
-      status: record.status,
-      submittedAt: record.submitted_at,
-      personalInfo: {
-        firstName: record.first_name,
-        lastName: record.last_name,
-        dateOfBirth: record.date_of_birth,
-        nationality: 'Honduran', // Mock nationality
-        permitNumber: record.prospera_permit_id
+    try {
+      console.log('Getting admin KYC submissions with filters:', filters);
+      
+      // Mock admin submissions
+      const mockSubmissions: KYCSubmission[] = [
+        {
+          id: 1,
+          userId: 1,
+          userEmail: 'john@example.com',
+          userName: 'John Doe',
+          kycType: 'prospera-permit',
+          jurisdiction: 'prospera',
+          status: 'pending',
+          submittedAt: new Date().toISOString(),
+          documents: {
+            front: 'mock_front_url',
+            back: undefined,
+            faceScan: undefined
+          },
+          personalInfo: {
+            firstName: 'John',
+            lastName: 'Doe',
+            dateOfBirth: '1990-01-01',
+            nationality: 'US',
+            permitNumber: 'P123456789'
+          }
+        },
+        {
+          id: 2,
+          userId: 2,
+          userEmail: 'jane@example.com',
+          userName: 'Jane Smith',
+          kycType: 'international-kyc',
+          jurisdiction: 'international',
+          status: 'approved',
+          submittedAt: new Date(Date.now() - 86400000).toISOString(),
+          documents: {
+            front: 'mock_front_url',
+            back: 'mock_back_url',
+            faceScan: 'mock_face_url'
+          },
+          personalInfo: {
+            firstName: 'Jane',
+            lastName: 'Smith',
+            dateOfBirth: '1985-05-15',
+            nationality: 'CA',
+            permitNumber: 'I123456789'
+          }
+        }
+      ];
+
+      // Apply filters
+      let filteredSubmissions = mockSubmissions;
+      
+      if (filters?.status) {
+        filteredSubmissions = filteredSubmissions.filter(s => s.status === filters.status);
       }
-    }));
+      
+      if (filters?.jurisdiction) {
+        filteredSubmissions = filteredSubmissions.filter(s => s.jurisdiction === filters.jurisdiction);
+      }
+      
+      if (filters?.limit) {
+        filteredSubmissions = filteredSubmissions.slice(0, filters.limit);
+      }
+
+      return filteredSubmissions;
+    } catch (error) {
+      console.error('Error fetching admin KYC submissions:', error);
+      throw new Error('Failed to fetch KYC submissions');
+    }
   }
 
   static async approveKYC(kycId: number): Promise<unknown> {

@@ -53,7 +53,7 @@ export default function ProsperaKYCPage() {
                 Verification Submitted!
               </h2>
               <p className="text-gray-300 mb-8">
-                Your Prospera permit verification has been submitted. You'll receive an update within 24 hours.
+                Your Prospera permit verification has been submitted. You&apos;ll receive an update within 24 hours.
               </p>
               <Link 
                 href="/marketplace"

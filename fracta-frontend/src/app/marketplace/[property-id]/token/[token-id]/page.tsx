@@ -81,7 +81,7 @@ export default function TokenDetailPage() {
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-text-primary mb-4">Token Not Found</h1>
-            <p className="text-text-muted">The token you're looking for doesn't exist.</p>
+            <p className="text-text-muted">The token you&apos;re looking for doesn&apos;t exist.</p>
           </div>
         </div>
       </div>

@@ -21,6 +21,13 @@ export default function InternationalKYCPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [origin, setOrigin] = useState<string>('');
+  const [personalInfo, setPersonalInfo] = useState({
+    firstName: 'John',
+    lastName: 'Doe',
+    dateOfBirth: '1990-01-01',
+    nationality: 'US',
+    countryOfResidence: 'United States'
+  });
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -108,8 +115,8 @@ export default function InternationalKYCPage() {
     setIsSubmitting(true);
     
     try {
-      // For now, we'll submit mock data since we don't have all the personal info fields
-      // In a real implementation, you'd collect this data from the user
+      // For now, we&apos;ll submit mock data since we don&apos;t have all the personal info fields
+              // In a real implementation, you&apos;d collect this data from the user
       const kycData: InternationalKYCData = {
         document_type: documentType,
         document_number: 'MOCK-DOC-123',
@@ -239,7 +246,7 @@ export default function InternationalKYCPage() {
                       </div>
                       <div className="text-left">
                         <h3 className="text-xl font-semibold text-white">Continue on Mobile</h3>
-                        <p className="text-gray-300">Use your phone's camera for better document capture</p>
+                        <p className="text-gray-300">Use your phone&apos;s camera for better document capture</p>
                       </div>
                     </div>
                     <div className="mb-4">
@@ -382,7 +389,7 @@ export default function InternationalKYCPage() {
                       </svg>
                     </div>
                     <h3 className="text-xl font-semibold text-white mb-2">Scan QR Code</h3>
-                    <p className="text-gray-300">Use your phone's camera to scan this QR code</p>
+                    <p className="text-gray-300">Use your phone&apos;s camera to scan this QR code</p>
                   </div>
                   
                   {/* QR Code */}
