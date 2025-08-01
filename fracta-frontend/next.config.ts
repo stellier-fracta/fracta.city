@@ -68,6 +68,9 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  // Static generation settings
+  trailingSlash: false,
 };
 
 export default nextConfig;

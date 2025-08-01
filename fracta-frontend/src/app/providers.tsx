@@ -5,6 +5,7 @@ import { WagmiProvider, http } from 'wagmi';
 import { RainbowKitProvider, getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { base, baseSepolia } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { WalletConnectFallback } from '@/components/WalletConnectFallback';
 
 // Custom dark theme for RainbowKit
 import '@rainbow-me/rainbowkit/styles.css';
@@ -43,19 +44,41 @@ const darkTheme = {
   modalTextDim: 'rgba(255, 255, 255, 0.3)',
 };
 
-const config = getDefaultConfig({
-  appName: 'Fracta.city',
-  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || '',
-  chains: [base, baseSepolia],
-  transports: {
-    [base.id]: http(),
-    [baseSepolia.id]: http(),
-  },
-});
+// Get project ID with fallback for build time
+const getProjectId = () => {
+  const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
+  if (!projectId || projectId === '00000000000000000000000000000000') {
+    return null;
+  }
+  return projectId;
+};
+
+const projectId = getProjectId();
 
 const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  // If WalletConnect is not configured, show fallback
+  if (!projectId) {
+    return (
+      <div>
+        {children}
+        <WalletConnectFallback />
+      </div>
+    );
+  }
+
+  // Create config only when projectId is available
+  const config = getDefaultConfig({
+    appName: 'Fracta.city',
+    projectId,
+    chains: [base, baseSepolia],
+    transports: {
+      [base.id]: http(),
+      [baseSepolia.id]: http(),
+    },
+  });
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
